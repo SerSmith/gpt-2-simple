@@ -14,7 +14,7 @@ import time
 from datetime import datetime
 import csv
 import argparse
-
+from  gpt_2_simple.src.simmilarity import get_text_vectors, get_simmilartity
 # if in Google Colaboratory
 try:
     from google.colab import drive
@@ -258,6 +258,9 @@ def finetune(sess,
 
     print('Loading dataset...')
     chunks = load_dataset(enc, dataset, combine)
+    dataset = pd.read_csv(dataset)
+    dataset
+    simmilarity.get_text_vectors(['I am groot qwerty', 'Am I crazy?', "One Two Three"] * 4000)
     data_sampler = Sampler(chunks)
     print('dataset has', data_sampler.total_size, 'tokens')
     print('Training...')
@@ -284,7 +287,7 @@ def finetune(sess,
         with open(counter_path, 'w') as fp:
             fp.write(str(counter-1) + '\n')
 
-    def generate_samples():
+    def generate_samples(calculate_sim=False):
         context_tokens = data_sampler.sample(1)
         all_text = []
         index = 0
@@ -305,6 +308,10 @@ def finetune(sess,
                              'samples-{}').format(counter), 'w') as fp:
             fp.write('\n'.join(all_text))
 
+        if calculate_sim:
+            text
+            return 
+
     def sample_batch():
         return [data_sampler.sample(1024) for _ in range(batch_size)]
 
@@ -321,6 +328,7 @@ def finetune(sess,
         steps = int(steps)
     
     try:
+        history = {"loss": [], "simmilarity": []}
         while True:
             if steps > 0 and counter == (counter_base + steps):
                 save()
@@ -346,7 +354,7 @@ def finetune(sess,
             if counter % print_every == 0:
                 avg_loss = (avg_loss[0] * 0.99 + v_loss,
                             avg_loss[1] * 0.99 + 1.0)
-
+                history['loss'].append([[counter, v_loss, avg_loss[0], avg_loss[1]]])
                 print(
                     '[{counter} | {time:2.2f}] loss={loss:2.2f} avg={avg:2.2f}'
                     .format(
@@ -360,6 +368,7 @@ def finetune(sess,
         print('interrupted')
         save()
 
+    return history
 
 def load_gpt2(sess,
               checkpoint='latest',
