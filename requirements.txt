@@ -4,3 +4,6 @@ requests
 tqdm
 numpy
 toposort
+nltk==3.5
+scipy
+Sklearn
