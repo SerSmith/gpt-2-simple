@@ -1,20 +1,17 @@
 from sklearn.feature_extraction.text import HashingVectorizer
-from nltk.tokenize import NLTKWordTokenizer
 import numpy as np
 import string
-from nltk import WordNetLemmatizer
+import nltk
 
 def get_text_vectors(data, n_features=2**20):
-    lemmatizer = WordNetLemmatizer()
+    lemmatizer = nltk.WordNetLemmatizer()
     data_cleaned = [s.translate(str.maketrans('', '', string.punctuation)).lower() for s in data]
     data_cleaned = [' '.join([lemmatizer.lemmatize(w) for w in s.split(' ')]) for s in  data_cleaned]
-    print(data_cleaned)
-    tk = NLTKWordTokenizer()
     vectorizer = HashingVectorizer(n_features=n_features,
                                    binary=True,
                                    norm=None,
                                    stop_words=None,
-                                   tokenizer=tk.tokenize)
+                                   tokenizer=nltk.word_tokenize)
     X = vectorizer.fit_transform(data_cleaned)
     return X
 
@@ -33,9 +30,3 @@ def get_simmilartity(first, second):
     matched_words_quant = (first * second.T) / max_phrase_length
 
     return matched_words_quant
-
-X1 = get_text_vectors(['I am groot qwerty', 'Am I crazy?', "One Two Three"] * 4000)
-X2 = get_text_vectors(['I am groot', 'Am I crazy?', "One Two Three"])
-print(get_simmilartity(X1, X2))
-# print(X * X.T)
-# print(X.sum(axis=1))
