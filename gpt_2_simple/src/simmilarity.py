@@ -3,7 +3,15 @@ import numpy as np
 import string
 import nltk
 
-def get_text_vectors(data, n_features=2**20):
+def remove_multiple_strings(cur_string, replace_list):
+    for cur_word in replace_list:
+        cur_string = cur_string.replace(cur_word, '')
+    return cur_string
+
+def get_text_vectors(data, ignore_words=None, n_features=2**20):
+    if ignore_words is None:
+        ignore_words = ["<|startoftext|>", "<|endoftext|>"]
+    data = [remove_multiple_strings(s, ignore_words) for s in data]
     lemmatizer = nltk.WordNetLemmatizer()
     data_cleaned = [s.translate(str.maketrans('', '', string.punctuation)).lower() for s in data]
     data_cleaned = [' '.join([lemmatizer.lemmatize(w) for w in s.split(' ')]) for s in  data_cleaned]

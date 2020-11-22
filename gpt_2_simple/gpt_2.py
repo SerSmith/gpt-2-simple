@@ -139,7 +139,7 @@ def finetune(sess,
              run_name='run1',
              checkpoint_dir='checkpoint',
              sample_every=100,
-             sample_length=100,
+             sample_length=20,
              sample_num=1,
              multi_gpu=False,
              save_every=1000,
@@ -330,7 +330,7 @@ def finetune(sess,
         while True:
             if steps > 0 and counter == (counter_base + steps):
                 save()
-                return
+                return history
             if (counter - 1) % save_every == 0 and counter > 1:
                 save()
             if (counter - 1) % sample_every == 0 and counter > 1:
@@ -338,7 +338,7 @@ def finetune(sess,
                 dataset_text_vectors = simmilarity.get_text_vectors(sample_texts)
                 simmilarity_matrix = get_simmilarity(train_file_text_vectors, dataset_text_vectors)
                 max_sim_by_sample = simmilarity_matrix.max(axis=0)
-                print(max_sim_by_sample)
+                print(max_sim_by_sample.shape)
                 history["simmilarity"].append([[counter, max_sim_by_sample.mean(), max_sim_by_sample.max()]])
 
             if accumulate_gradients > 1:
@@ -370,8 +370,7 @@ def finetune(sess,
     except KeyboardInterrupt:
         print('interrupted')
         save()
-
-    return history
+        return history
 
 def load_gpt2(sess,
               checkpoint='latest',
