@@ -50,7 +50,7 @@ def load_dataset(enc, path, combine):
     if raw_text:
         tokens = np.stack(enc.encode(raw_text))
         token_chunks.append(tokens)
-    return token_chunks, paths
+    return token_chunks
 
 
 def binary_search(f, lo, hi):
