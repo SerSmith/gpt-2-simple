@@ -15,6 +15,8 @@ from datetime import datetime
 import csv
 import argparse
 from  gpt_2_simple.src.simmilarity import get_text_vectors, get_simmilartity
+import pandas as pd
+import gpt_2_simple.src.simmilarity as simmilarity
 # if in Google Colaboratory
 try:
     from google.colab import drive
@@ -137,7 +139,7 @@ def finetune(sess,
              run_name='run1',
              checkpoint_dir='checkpoint',
              sample_every=100,
-             sample_length=1023,
+             sample_length=100,
              sample_num=1,
              multi_gpu=False,
              save_every=1000,
@@ -258,9 +260,8 @@ def finetune(sess,
 
     print('Loading dataset...')
     chunks = load_dataset(enc, dataset, combine)
-    dataset = pd.read_csv(dataset)
-    dataset
-    simmilarity.get_text_vectors(['I am groot qwerty', 'Am I crazy?', "One Two Three"] * 4000)
+    dataset_file = pd.read_csv(dataset, squeeze = True, header=None)
+    train_file_text_vectors = simmilarity.get_text_vectors(dataset_file.to_list())
     data_sampler = Sampler(chunks)
     print('dataset has', data_sampler.total_size, 'tokens')
     print('Training...')
@@ -287,7 +288,7 @@ def finetune(sess,
         with open(counter_path, 'w') as fp:
             fp.write(str(counter-1) + '\n')
 
-    def generate_samples(calculate_sim=False):
+    def generate_samples(calculate_samples_text=False):
         context_tokens = data_sampler.sample(1)
         all_text = []
         index = 0
@@ -297,8 +298,6 @@ def finetune(sess,
                 feed_dict={context: batch_size * [context_tokens]})
             for i in range(min(sample_num - index, batch_size)):
                 text = enc.decode(out[i])
-                text = '======== SAMPLE {} ========\n{}\n'.format(
-                    index + 1, text)
                 all_text.append(text)
                 index += 1
         print(text)
@@ -308,9 +307,8 @@ def finetune(sess,
                              'samples-{}').format(counter), 'w') as fp:
             fp.write('\n'.join(all_text))
 
-        if calculate_sim:
-            text
-            return 
+        if calculate_samples_text:
+            return all_text
 
     def sample_batch():
         return [data_sampler.sample(1024) for _ in range(batch_size)]
@@ -336,7 +334,8 @@ def finetune(sess,
             if (counter - 1) % save_every == 0 and counter > 1:
                 save()
             if (counter - 1) % sample_every == 0 and counter > 1:
-                generate_samples()
+                sample_texts = generate_samples(calculate_samples_text=True)
+                dataset_text_vectors = simmilarity.get_text_vectors(sample_texts)
 
             if accumulate_gradients > 1:
                 sess.run(opt_reset)
