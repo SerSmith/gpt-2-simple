@@ -337,7 +337,9 @@ def finetune(sess,
                 sample_texts = generate_samples(calculate_samples_text=True)
                 dataset_text_vectors = simmilarity.get_text_vectors(sample_texts)
                 simmilarity_matrix = get_simmilarity(train_file_text_vectors, dataset_text_vectors)
-                history["simmilarity"].append()
+                max_sim_by_sample = simmilarity_matrix.max(axis=0)
+                print(max_sim_by_sample)
+                history["simmilarity"].append([[counter, max_sim_by_sample.mean(), max_sim_by_sample.max()]])
 
             if accumulate_gradients > 1:
                 sess.run(opt_reset)
