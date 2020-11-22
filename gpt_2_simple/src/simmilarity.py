@@ -16,7 +16,7 @@ def get_text_vectors(data, n_features=2**20):
     return X
 
 
-def get_simmilartity(first, second):
+def get_simmilarity(first, second):
     
     word_quant_first = first.sum(axis=1)
     word_quant_second = second.sum(axis=1)
