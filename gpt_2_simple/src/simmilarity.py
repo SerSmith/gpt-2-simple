@@ -2,6 +2,8 @@ from sklearn.feature_extraction.text import HashingVectorizer
 import numpy as np
 import string
 import nltk
+from nltk.corpus import stopwords
+
 
 def remove_multiple_strings(cur_string, replace_list):
     for cur_word in replace_list:
@@ -19,8 +21,9 @@ def get_text_vectors(data,
     data = [s.split(end_symbol)[0] for s in data]
     data = [remove_multiple_strings(s, ignore_words) for s in data]
     lemmatizer = nltk.WordNetLemmatizer()
+    st = stopwords.words('english')
     data_cleaned = [s.translate(str.maketrans('', '', string.punctuation)).lower() for s in data]
-    data_cleaned = [' '.join([lemmatizer.lemmatize(w) for w in s.split(' ')]) for s in  data_cleaned]
+    data_cleaned = [' '.join([lemmatizer.lemmatize(w) for w in s.split(' ') if s not in st]) for s in data_cleaned]
     vectorizer = HashingVectorizer(n_features=n_features,
                                    binary=True,
                                    norm=None,
