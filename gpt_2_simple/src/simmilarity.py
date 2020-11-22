@@ -8,9 +8,15 @@ def remove_multiple_strings(cur_string, replace_list):
         cur_string = cur_string.replace(cur_word, '')
     return cur_string
 
-def get_text_vectors(data, ignore_words=None, n_features=2**20):
+def get_text_vectors(data,
+                    ignore_words=None,
+                    start_symbol="<|startoftext|>",
+                    end_symbol="<|endoftext|>",
+                    n_features=2**20):
     if ignore_words is None:
-        ignore_words = ["<|startoftext|>", "<|endoftext|>"]
+        ignore_words = [start_symbol, end_symbol]
+    #Оставим только один мем
+    data = [s.split(end_symbol)[0] for s in data]
     data = [remove_multiple_strings(s, ignore_words) for s in data]
     lemmatizer = nltk.WordNetLemmatizer()
     data_cleaned = [s.translate(str.maketrans('', '', string.punctuation)).lower() for s in data]
