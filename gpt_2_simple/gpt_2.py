@@ -14,7 +14,7 @@ import time
 from datetime import datetime
 import csv
 import argparse
-from  gpt_2_simple.src.simmilarity import get_text_vectors, get_simmilartity
+from  gpt_2_simple.src.simmilarity import get_text_vectors, get_simmilarity
 import pandas as pd
 import gpt_2_simple.src.simmilarity as simmilarity
 # if in Google Colaboratory
@@ -336,6 +336,8 @@ def finetune(sess,
             if (counter - 1) % sample_every == 0 and counter > 1:
                 sample_texts = generate_samples(calculate_samples_text=True)
                 dataset_text_vectors = simmilarity.get_text_vectors(sample_texts)
+                simmilarity_matrix = get_simmilarity(train_file_text_vectors, dataset_text_vectors)
+                history["simmilarity"].append()
 
             if accumulate_gradients > 1:
                 sess.run(opt_reset)
